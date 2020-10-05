@@ -1,3 +1,5 @@
+% https://fr.mathworks.com/matlabcentral/answers/235525-image-to-audio-using-matlab
+
 % Initialization / clean-up code.
 clc;    % Clear the command window.
 close all;  % Close all figures (except those of imtool.)
@@ -11,7 +13,7 @@ fontSize = 20;
 % Create the filename where we will save the waveform.
 folder = pwd;
 baseFileName = 'Test_Wave.wav';
-fullFileName = fullfile(folder, baseFileName);
+fullFileName = fullfile(folder, ['/resources/sounds/', baseFileName]);
 fprintf('Full File Name = %s\n', fullFileName);
 titleBarCaption = 'Continue?';
 
@@ -28,8 +30,7 @@ Amplitude = 32767;
 
 % Read in an image.
 fileName = 'resources/piou-piou.jpg';
-fileName = rgb2gray(fileName);
-grayImage = imread(fileName);
+grayImage = imread(fileName); 
 
 % Display the gray scale image.
 subplot(2, 2, 1);
@@ -41,7 +42,7 @@ binaryImage = imbinarize(grayImage);
 
 % Display the binary image.
 subplot(2, 2, 3);
-imshow(binaryImage);
+imshowpair(grayImage, binaryImage, 'montage');
 title('Binary Image', 'FontSize', fontSize);
 
 % Construct the waveform:
