@@ -1,0 +1,5 @@
+# Fichiers MATLAB à exclure
+/MATLAB/resources
+# /MATLAB/resources/images
+# /MATLAB/resources/sounds
+*.asv
