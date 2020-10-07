@@ -1,9 +1,5 @@
-function binaryImage = binarizeImage(fileName)
-    grayImage = imread(fileName);
+function binaryImage = binarizeImage(grayImage)
+    % grayImage = imread(fileName);
     binaryImage = imbinarize(grayImage);
-    whos
-    originalImage = imageinfo(fileName); 
-    figure()
-    imshowpair(grayImage, binaryImage, 'montage');
-    
+    imshowpair(grayImage, binaryImage, 'montage'); 
 end
