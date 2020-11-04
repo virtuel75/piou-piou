@@ -10,8 +10,8 @@ let stringifyData = (data: any) => {
 }
 
 let parseData = (str: string) => {
-    let result = decodeURI(str)
-    result = JSON.parse(result)
+    let result_str = decodeURI(str)
+    let result = JSON.parse(result_str)
     return result
 }
 
