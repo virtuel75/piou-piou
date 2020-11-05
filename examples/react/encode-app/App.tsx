@@ -49,7 +49,9 @@ export default function App() {
         <TextInput style={styles.input}
           placeholder={'Enter your text here'}
           onChangeText={text => setText(text)}
-          value={text} />
+          value={text}
+          multiline={true}
+          numberOfLines={2} />
         <View style={styles.buttonContainer}>
           <View style={styles.button}>
             <Button onPress={handleConvert}
