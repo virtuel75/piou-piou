@@ -1,13 +1,69 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Button, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Converter } from './src/helpers/converter';
+import { Base64Encoder } from './src/helpers/encoder';
 
 export default function App() {
+  const [text, setText] = useState<string>('')
+  const [encodedText, setEncodedText] = useState<string>('')
+  const [decodedText, setDecodedText] = useState<string>('')
+  const [binaryText, setBinaryText] = useState<string>('')
+  const [strFromBinarytext, setStrFromBinarytext] = useState<string>('')
+
+  let handleClear = () => {
+    setText('')
+    setEncodedText('')
+    setDecodedText('')
+    setBinaryText('')
+    setStrFromBinarytext('')
+  }
+
+  let handleConvert = () => {
+    if (!text) {
+      setText('')
+    }
+
+    // encode the object into base64 string
+    const encodedData = Base64Encoder.encode(text)
+    // transform the encoded object into binary array
+    const binaryData = Converter.stringToBinary(encodedData)
+    // transform binary array into base64 string
+    const strFromBinary = Converter.binaryToString(binaryData)
+    // decode the base64 string
+    const decodedData = Base64Encoder.decode(strFromBinary)
+
+    console.log('Original obj', text)
+    console.log('Encoded obj', encodedData)
+    setEncodedText(encodedData)
+    console.log('Binary representation of the encoded obj', binaryData)
+    setBinaryText(binaryData.join(''))
+    console.log('Binary array to string', strFromBinary)
+    setStrFromBinarytext(strFromBinary)
+    console.log('Decoded obj', decodedData)
+    setDecodedText(decodedData)
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.inputContainer}>
+        <TextInput style={styles.input}
+          placeholder={'Enter your text here'}
+          onChangeText={text => setText(text)}
+          value={text} />
+        <View style={styles.buttonContainer}>
+          <Button onPress={handleConvert}
+            title={"Run"} />
+          <Button onPress={handleClear}
+            title={"Clear"} />
+        </View>
+      </View>
+      <ScrollView style={styles.displayContainer}>
+        <Text style={styles.text}>Encoded object : {encodedText}</Text>
+        <Text style={styles.text}>Binary representation of the encoded obj : {binaryText}</Text>
+        <Text style={styles.text}>Binary array to string : {strFromBinarytext}</Text>
+        <Text style={styles.text}>Decoded object : {decodedText}</Text>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -17,5 +73,36 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: Platform.OS == 'android' ? StatusBar.currentHeight : 0
   },
+  inputContainer: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: 10
+  },
+  buttonContainer: {
+    width: '80%',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around"
+  },
+  displayContainer: {
+    width: '100%',
+    backgroundColor: '#f1f1f1',
+    padding: 10
+  },
+  input: {
+    height: 40,
+    marginBottom: 20,
+    paddingLeft: 10,
+    paddingRight: 10,
+    borderColor: '#636e72',
+    borderWidth: 2,
+    borderRadius: 4,
+    width: '80%'
+  },
+  text: {
+    padding: 6
+  }
 });
