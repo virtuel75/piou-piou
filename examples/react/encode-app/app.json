@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "encode-app",
-    "slug": "encode-app",
+    "name": "Encode object",
+    "slug": "encode-object",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -27,6 +27,8 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "description": "Encode any object into a base 64 string & binary array",
+    "githubUrl": "https://github.com/virtuel75/piou-piou.git"
   }
 }
