@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     marginTop: Platform.OS == 'android' ? StatusBar.currentHeight : 0
   },
   title: {
-    marginTop: 6,
+    marginTop: 10,
     marginBottom: 20,
     fontSize: 25,
     color: '#2d3436'
