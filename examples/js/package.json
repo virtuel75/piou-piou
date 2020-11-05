@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test1": "ts-node ./src/encodeObject.ts"
+    "encode-test": "ts-node ./src/encodeObject.ts"
   },
   "license": "MIT",
   "devDependencies": {
