@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { StatusBar as SB } from 'expo-status-bar';
 import { Button, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TextInput, View } from 'react-native';
 import Card from './src/components/card';
 import { Converter } from './src/helpers/converter';
@@ -44,6 +45,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <SB style="dark" />
       <Text style={styles.title}>Piou Piou - Encode Test</Text>
       <View style={styles.inputContainer}>
         <TextInput style={styles.input}
