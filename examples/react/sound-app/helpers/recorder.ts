@@ -1,102 +1,99 @@
-import { Audio } from 'expo-av';
+import { Audio, AVPlaybackStatus } from 'expo-av';
 import * as Permissions from "expo-permissions";
-import * as FileSystem from 'expo-file-system';
+
+export interface RecordResult {
+    recordURI: string | null,
+    sound: Audio.Sound,
+    status: AVPlaybackStatus
+}
 
 class Recorder {
-    private haveRecordingPermissions: boolean
-    private isRecording: boolean
-    private recording: Audio.Recording | null
-    private sound: Audio.Sound | null
-    private readonly recordingSettings: Audio.RecordingOptions
+    private _haveRecordingPermissions: boolean
+    private _recording: Audio.Recording | null
+    private readonly _recordingOptions: Audio.RecordingOptions
 
-    private readonly audioMode: Partial<Audio.AudioMode> = {
-        allowsRecordingIOS: true,
-        interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-        playsInSilentModeIOS: true,
-        shouldDuckAndroid: true,
-        interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
-        playThroughEarpieceAndroid: false,
-        staysActiveInBackground: true,
-    }
+    private audioMode: Partial<Audio.AudioMode> | null
 
     public constructor() {
-        this.haveRecordingPermissions = false
-        this.isRecording = false
+        this._haveRecordingPermissions = false
+        this._recording = null
+        this._recordingOptions = Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+        this.audioMode = null
 
-        this.recording = null
-        this.sound = null
-
-        this.recordingSettings = Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-
+        this._setAudioMode()
         this._askRecordingPermissions()
     }
 
     private _askRecordingPermissions = async () => {
         const response = await Permissions.askAsync(Permissions.AUDIO_RECORDING)
-        this.haveRecordingPermissions = response.status === "granted"
+        this._haveRecordingPermissions = response.status === "granted"
     }
 
-    public startRecording = async (statusUpdate?: (status: Audio.RecordingStatus) => void) => {
-        if (!statusUpdate) {
-            statusUpdate = () => { }
+    private _setAudioMode = () => {
+        this.audioMode = {
+            allowsRecordingIOS: true,
+            interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+            playsInSilentModeIOS: true,
+            shouldDuckAndroid: true,
+            interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+            playThroughEarpieceAndroid: false,
+            staysActiveInBackground: false,
         }
-        // check if we have the permission to record
-        if (this.haveRecordingPermissions) {
-            // check that we are not already recording
-            if (!this.isRecording) {
-                // we need to empty the sound before recording
-                if (this.sound !== null) {
-                    await this.sound.unloadAsync()
-                    this.sound.setOnPlaybackStatusUpdate(null)
-                    this.sound = null
-                }
-                // set the audio mode
+    }
+
+    private _resetRecording = async () => {
+        if (this._recording) {
+            const status = await this._recording.getStatusAsync()
+            if (!status.isRecording) {
+                this._recording.setOnRecordingStatusUpdate(null)
+                this._recording = null
+            } else {
+                console.warn('Cannot reset the recording yet. It is still working')
+            }
+        }
+    }
+
+    public startRecording = async (statusUpdate: ((status: Audio.RecordingStatus) => void) | null) => {
+        if (!this._recording) {
+            if (this._haveRecordingPermissions && this.audioMode) {
                 await Audio.setAudioModeAsync(this.audioMode)
-                // we need to empty the recorder before recording
-                if (this.recording !== null) {
-                    this.recording.setOnRecordingStatusUpdate(null)
-                    this.recording = null
+                this._recording = new Audio.Recording()
+                try {
+                    await this._recording.prepareToRecordAsync(this._recordingOptions)
+                    this._recording.setOnRecordingStatusUpdate(statusUpdate)
+                    await this._recording.startAsync()
+                } catch (error) {
+                    console.error('Error during recording', error)
+                    await this._resetRecording()
                 }
-                // set the recording
-                const recording = new Audio.Recording()
-                await recording.prepareToRecordAsync(this.recordingSettings)
-                recording.setOnRecordingStatusUpdate(statusUpdate)
-                // start recording
-                this.isRecording = true
-                this.recording = recording
-                await this.recording.startAsync()
+            } else {
+                console.warn('No permission to record')
+                await this._askRecordingPermissions()
             }
         } else {
-            console.log('No permission to record')
-            await this._askRecordingPermissions()
+            console.warn('Cannot start recording. The main recorder is working')
         }
     }
 
     public stopRecording = async () => {
-        // check that the recorder is not in use
-        if (!this.recording) {
-            return null
-        }
-        try {
-            // try to stop the recorder
-            await this.recording.stopAndUnloadAsync()
-            // get the file info
-            const info = await FileSystem.getInfoAsync(this.recording.getURI() || "")
-            console.log(`FILE INFO: ${JSON.stringify(info)}`)
-            // set the audio mode
-            await Audio.setAudioModeAsync(this.audioMode)
-            // retrieve the sound
-            const { sound, status } = await this.recording.createNewLoadedSoundAsync()
-            this.sound = sound
-            this.isRecording = false
-            return this.sound
-        } catch (error) {
-            if (error.code === "E_AUDIO_NODATA") {
-                console.log(`Stop was called too quickly, no data has yet been received (${error.message})`)
-            } else {
-                console.log("STOP ERROR: ", error.code, error.name, error.message)
+        if (this._recording) {
+            try {
+                await this._recording.stopAndUnloadAsync()
+                const recordURI = this._recording.getURI()
+                const { sound, status } = await this._recording.createNewLoadedSoundAsync()
+                const result: RecordResult = {
+                    recordURI: recordURI,
+                    sound: sound,
+                    status: status
+                }
+                await this._resetRecording()
+                return result
+            } catch (error) {
+                console.error('Error while stopping the recording', error)
+                await this._resetRecording()
             }
-            return null
+        } else {
+            console.warn('Cannot stop the recording because it has no been started yet')
         }
     }
 }
