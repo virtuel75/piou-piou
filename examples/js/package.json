@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "encode-test": "ts-node ./src/encodeObject.ts"
+    "encode-test": "ts-node ./src/encodeObject.ts",
+    "sound-test": "ts-node ./src/createwav.ts"
   },
   "license": "MIT",
   "devDependencies": {
