@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import { BitConverter } from "./byteConverter"
-import { BitsPerSampleType, SampleRateType, WaveBuilder, WAVEncoder } from './wav'
+import { BitsPerSampleType, SampleRateType, WaveBuilder, WAVEncoder } from './wavEncoder'
 
 let writebyte = () => {
     let nb: number = 25300
@@ -70,5 +70,10 @@ let createWave = () => {
     }
 }
 
+let analyseWave = () => {
+
+}
+
 //writebyte()
-createWave()
+//createWave()
+analyseWave()

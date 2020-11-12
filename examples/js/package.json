@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "encode-test": "ts-node ./src/encodeObject.ts",
-    "sound-test": "ts-node ./src/createwav.ts"
+    "sound-test": "ts-node ./src/soundTest.ts"
   },
   "license": "MIT",
   "devDependencies": {
