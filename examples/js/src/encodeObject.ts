@@ -1,4 +1,4 @@
-import base64 from './base64';
+import { Base64 } from "./base64";
 
 // size of a block
 const byteSize: number = 8
@@ -20,7 +20,7 @@ let encodeData = (data: any) => {
     let strData = stringifyData(data)
 
     // encode data
-    let encodedData = base64.encode(strData)
+    let encodedData = Base64.encode(strData)
 
     // return the data into a base64 string
     return encodedData
@@ -28,7 +28,7 @@ let encodeData = (data: any) => {
 
 let decodeData = (base64str: string) => {
     // decode the base64 string
-    let decodedString = base64.decode(base64str)
+    let decodedString = Base64.decode(base64str)
 
     // retrieve the data from the decoded string
     let data = parseData(decodedString)

@@ -1,10 +1,16 @@
-import { BitConverter, DefaultBitPerElement } from "./byteConverter"
+import { BitSeparator } from "./bitSeparator"
 
+/**
+ * Type of channel
+ */
 export enum ChannelType {
     MONO = 1,
     STEREO = 2
 }
 
+/**
+ * Type of sample rate
+ */
 export enum SampleRateType {
     RATE_8000 = 8000,
     RATE_44100 = 44100,
@@ -12,26 +18,37 @@ export enum SampleRateType {
     RATE_96000 = 96000
 }
 
+/**
+ * Type of bits per sample
+ */
 export enum BitsPerSampleType {
     BIT_8 = 8,
-    BIT_16 = 16,
-    BIT_32 = 32
+    BIT_16 = 16
 }
 
+/**
+ * Type of sound wave
+ */
 export enum SoundWaveType {
     SIN,
     COS,
     SQUARE,
 }
 
+/**
+ * Result of a wave encoder
+ */
 export interface WAVEncoderResult {
-    header: number[]
+    //header: number[]
     data: number[]
     bitsPerSample: BitsPerSampleType,
     numberOfSample: number,
     isCorrect: boolean
 }
 
+/**
+ * Result of a generated wave data
+ */
 export interface Wave {
     data: number[],
     numChannel: number,
@@ -41,6 +58,9 @@ export interface Wave {
     blockAlign: number
 }
 
+/**
+ * Class that provide functions in order to genarate wave data
+ */
 export class WaveBuilder {
     private readonly _numChannels: number
     private readonly _sampleRate: number
@@ -65,18 +85,28 @@ export class WaveBuilder {
         return Math.sin((w * t) + phase)
     }
 
-    private _cosFormula = (w: number, index: number, phase: number = 0) => {
-        return Math.sin((w * index) + phase)
+    private _cosFormula = (w: number, t: number, phase: number = 0) => {
+        return Math.sin((w * t) + phase)
     }
 
+    private _squareFormula = (w: number, t: number, phase: number = 0) => {
+        return 0
+    }
+
+    /**
+     * Build of sound wave data
+     * @param frequency Frenquency of the sound
+     * @param duration DUration of the sound in seconds
+     * @param amplitude Amplitude of the sound on %
+     * @param soundWaveType Type of sound wave
+     */
     public generateData = (frequency: number, duration: number, amplitude: number = 100, soundWaveType: SoundWaveType = SoundWaveType.SIN) => {
         const w: number = 2 * Math.PI * frequency
-        const p: number = 1 / frequency
         const max_amplitude: number = Math.pow(2, (this.BitsPerSample - 1)) - 1
         let data: number[] = []
 
+        amplitude = Math.min(amplitude, 100)
         amplitude = (amplitude * max_amplitude) / 100
-        amplitude = amplitude < max_amplitude ? amplitude : max_amplitude
 
         for (let i = 0; i < this.SampleRate * duration; i++) {
             const t: number = i * (1 / this.SampleRate)
@@ -86,19 +116,22 @@ export class WaveBuilder {
                 case SoundWaveType.COS:
                     value = amplitude * this._cosFormula(w, t)
                     break;
+                case SoundWaveType.SQUARE:
+                    value = amplitude * this._squareFormula(w, t)
+                    break;
                 default:
                     value = amplitude * this._sinFormula(w, t)
                     break;
             }
 
-            if (this.BitsPerSample == BitsPerSampleType.BIT_8) {
-                value += max_amplitude
-            }
+            value += (max_amplitude * (this._bitsPerSample / 8))
 
-            const intergerValue: number = Math.round(value)
+            const integerValue: number = Math.round(value)
+            const tmp: number[] = BitSeparator.split(integerValue, 8, this._bitsPerSample / 8)
+            tmp.reverse()
 
             for (let j = 0; j < this.NumChannel; j++) {
-                data.push(intergerValue)
+                data.push(...tmp)
             }
         }
 
@@ -115,6 +148,9 @@ export class WaveBuilder {
     }
 }
 
+/**
+ * Class that provide functions to build a .wav's file data
+ */
 export class WAVEncoder {
     // chunk descriptor
     public static readonly CHUNK_ID: string = 'RIFF'
@@ -130,6 +166,10 @@ export class WAVEncoder {
     public constructor() {
     }
 
+    /**
+     * Build .wav data
+     * @param data wave data
+     */
     public static generateSound = (data: Wave | Wave[]) => {
         let soundData: number[] = []
         let chunkSize: number = 0
@@ -145,6 +185,7 @@ export class WAVEncoder {
             } else {
                 wavDataArray = [...data]
             }
+
             isDataCorrect = wavDataArray.every((val, i, arr) => {
                 return val.bitsPerSample == arr[0].bitsPerSample && val.numChannel == arr[0].numChannel && val.sampleRate == arr[0].sampleRate
             })
@@ -167,44 +208,49 @@ export class WAVEncoder {
             // build file data
             // -> chunk info
             // chunk ID (big-endian) - 4 bytes
-            header.push(...BitConverter.stringToBlocsOfBits(WAVEncoder.CHUNK_ID))
+            header.push(...BitSeparator.splitString(WAVEncoder.CHUNK_ID))
             // chunk size (litlle-endian) - 4 bytes
-            header.push(...BitConverter.unsignedNumberToBlocsOfBits(chunkSize, DefaultBitPerElement.DEFAULT_8_BITS, 4).reverse())
+            header.push(...BitSeparator.split(chunkSize, 8, 4).reverse())
             // format (big-endian) - 4 bytes
-            header.push(...BitConverter.stringToBlocsOfBits(WAVEncoder.FORMAT))
+            header.push(...BitSeparator.splitString(WAVEncoder.FORMAT))
 
             // -> sub chunk 1 info
             // sub chunk 1 ID (bif-endian) - 4 bytes
-            header.push(...BitConverter.stringToBlocsOfBits(WAVEncoder.SUBCHUNK_1_ID))
+            header.push(...BitSeparator.splitString(WAVEncoder.SUBCHUNK_1_ID))
             // sub chunk 1 size (litlle-endian) - 4 bytes
-            header.push(...BitConverter.unsignedNumberToBlocsOfBits(subchunk1Size, DefaultBitPerElement.DEFAULT_8_BITS, 4).reverse())
+            header.push(...BitSeparator.split(subchunk1Size, 8, 4).reverse())
             // audio format (litlle endian) - 2 bytes
-            header.push(...BitConverter.unsignedNumberToBlocsOfBits(WAVEncoder.AUDIO_FORMAT, DefaultBitPerElement.DEFAULT_8_BITS, 2).reverse())
+            header.push(...BitSeparator.split(WAVEncoder.AUDIO_FORMAT, 8, 2).reverse())
             // number of channel (litlle endian) - 2 bytes
-            header.push(...BitConverter.unsignedNumberToBlocsOfBits(wavDataArray[0].numChannel, DefaultBitPerElement.DEFAULT_8_BITS, 2).reverse())
+            header.push(...BitSeparator.split(wavDataArray[0].numChannel, 8, 2).reverse())
             // sample rate (litlle endian) - 4 bytes
-            header.push(...BitConverter.unsignedNumberToBlocsOfBits(wavDataArray[0].sampleRate, DefaultBitPerElement.DEFAULT_8_BITS, 4).reverse())
+            header.push(...BitSeparator.split(wavDataArray[0].sampleRate, 8, 4).reverse())
             // byterate (litlle endian) - 4 bytes
-            header.push(...BitConverter.unsignedNumberToBlocsOfBits(wavDataArray[0].byteRate, DefaultBitPerElement.DEFAULT_8_BITS, 4).reverse())
+            header.push(...BitSeparator.split(wavDataArray[0].byteRate, 8, 4).reverse())
             // block align (little endian) - 2 bytes
-            header.push(...BitConverter.unsignedNumberToBlocsOfBits(wavDataArray[0].blockAlign, DefaultBitPerElement.DEFAULT_8_BITS, 2).reverse())
+            header.push(...BitSeparator.split(wavDataArray[0].blockAlign, 8, 2).reverse())
             // bits per sample (litlle endian) - 2 bytes
-            header.push(...BitConverter.unsignedNumberToBlocsOfBits(bitsPerSample, DefaultBitPerElement.DEFAULT_8_BITS, 2).reverse())
+            header.push(...BitSeparator.split(bitsPerSample, 8, 2).reverse())
 
             // -> sub chunk 2
             // sub chunk 2 ID (big-endian) - 4 bytes
-            header.push(...BitConverter.stringToBlocsOfBits(WAVEncoder.SUBCHUNK_2_ID))
+            header.push(...BitSeparator.splitString(WAVEncoder.SUBCHUNK_2_ID))
             // sub chunk 2 size (litlle endian) - 4 bytes
-            header.push(...BitConverter.unsignedNumberToBlocsOfBits(subchunk2Size, DefaultBitPerElement.DEFAULT_8_BITS, 4).reverse())
+            header.push(...BitSeparator.split(subchunk2Size, 8, 4).reverse())
             // data (litlle endian) - subchunk2Size bytes
-            //soundData.reverse()
+            // soundData
         } else {
             console.warn('Error : data is not correct')
         }
 
+        let byteArray: number[] = [...header]
+
+        for (let i = 0; i < soundData.length; i++) {
+            byteArray.push(soundData[i])
+        }
+
         const result: WAVEncoderResult = {
-            header: header,
-            data: soundData,
+            data: byteArray,
             bitsPerSample: bitsPerSample,
             isCorrect: isDataCorrect,
             numberOfSample: subchunk2Size
