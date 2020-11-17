@@ -1,6 +1,6 @@
 import * as fs from 'fs'
-import { BitSeparator } from './bitSeparator'
-import { BitsPerSampleType, SampleRateType, WaveBuilder, WAVEncoder } from './wavEncoder'
+import { BitSeparator } from './helpers/bitSeparator'
+import { BitsPerSampleType, SampleRateType, WaveBuilder, WAVEncoder } from './helpers/wavEncoder'
 
 let writebyte = () => {
     let nb: number = 25300

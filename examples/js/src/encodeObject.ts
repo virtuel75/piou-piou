@@ -1,4 +1,4 @@
-import { Base64 } from "./base64";
+import { Base64 } from "./helpers/base64";
 
 // size of a block
 const byteSize: number = 8
