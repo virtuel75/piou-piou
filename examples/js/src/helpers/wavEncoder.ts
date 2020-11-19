@@ -39,7 +39,6 @@ export enum SoundWaveType {
  * Result of a wave encoder
  */
 export interface WAVEncoderResult {
-    //header: number[]
     data: number[]
     bitsPerSample: BitsPerSampleType,
     numberOfSample: number,
