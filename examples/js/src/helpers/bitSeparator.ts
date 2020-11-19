@@ -78,4 +78,21 @@ export class BitSeparator {
         return result
     }
 
+    /**
+     * Assemble string from byte array
+     * @param bytes bytes of character
+     */
+    public static assembleString = (bytes: number[]) => {
+        let result: string = ''
+
+        for (let i = 0; bytes && i < bytes.length; i++) {
+            const val: number = bytes[i]
+            const character: string = String.fromCharCode(val)
+
+            result += character
+        }
+
+        return result
+    }
+
 }
