@@ -1,5 +1,5 @@
 import * as fs from 'fs'
-import { BitSeparator } from './helpers/bitSeparator'
+import { WavAnalyser } from './helpers/wavAnalyser'
 import { BitsPerSampleType, SampleRateType, WaveBuilder, WAVEncoder } from './helpers/wavEncoder'
 
 let writebyte = () => {
@@ -49,21 +49,9 @@ let createWave = () => {
 let analyseWave = () => {
     const filename: string = "output_temp/test.wav"
 
-    // let buffer = fs.readFileSync(filename)
-    // let json = JSON.stringify(buffer.slice(0, 4))
-    // let obj: number[] = JSON.parse(json).data
-
-    // console.log(obj.map(c => String.fromCharCode(c)).join(''))
-
-    // let encoded = Base64.encode('Bonjour')
-    // let decoded = Base64.decode(encoded)
-
-    // console.log(encoded)
-    // console.log(decoded)
-
-    console.log(BitSeparator.split(3, 1))
+    WavAnalyser.analyseFile(filename)
 }
 
 //writebyte()
-createWave()
+//createWave()
 //analyseWave()
