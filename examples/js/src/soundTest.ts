@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import { BitSeparator } from './helpers/bitSeparator'
 import { WavAnalyser } from './helpers/wavAnalyser'
 import { BitsPerSampleType, SampleRateType, WaveBuilder, WAVEncoder } from './helpers/wavEncoder'
 
@@ -42,7 +43,7 @@ let createWave = () => {
         }
 
         // write the output file
-        fs.writeFileSync(output_path, Int8Array.from(result.data), { encoding: null })
+        fs.writeFileSync(output_path, Uint8Array.from(result.data), { encoding: null })
     }
 }
 
@@ -53,5 +54,5 @@ let analyseWave = () => {
 }
 
 //writebyte()
-//createWave()
-//analyseWave()
+createWave()
+analyseWave()

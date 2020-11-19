@@ -45,10 +45,11 @@ export class BitSeparator {
         }
 
         let result: number = 0
+        const base: number = Math.pow(2, bitsPerElement)
 
         for (let i = 0; i < arr.length; i++) {
             const val: number = arr[i]
-            result += val * Math.pow(bitsPerElement, i)
+            result += val * Math.pow(base, arr.length - i - 1)
         }
 
         return result
