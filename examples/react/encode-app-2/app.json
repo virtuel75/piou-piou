@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "encode-app-2",
-    "slug": "encode-app-2",
+    "name": "Encode app v2",
+    "slug": "encode-app-v2",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -28,6 +28,7 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "description": "Encode app version 2\n- frequency shift\n- phase shift"
   }
 }
