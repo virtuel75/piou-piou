@@ -120,7 +120,7 @@ export class WaveBuilder {
                     value = amplitude * this._squareFormula(w, t, phase)
                     break;
                 default:
-                    value = amplitude * this._sinFormula(w, t)
+                    value = amplitude * this._sinFormula(w, t, phase)
                     break;
             }
 
@@ -156,7 +156,7 @@ export class WaveBuilder {
      */
     public generatePeriod = (frequency: number, phase: number, amplitude: number = 100, soundWaveType: SoundWaveType = SoundWaveType.SIN) => {
         const period: number = 1 / frequency
-        return this.generateData(frequency, 0, period, amplitude, soundWaveType)
+        return this.generateData(frequency, phase, period, amplitude, soundWaveType)
     }
 }
 

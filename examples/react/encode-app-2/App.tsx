@@ -133,8 +133,8 @@ export default class App extends Component<any, any> {
 
     console.log('Converting data into binary array')
     for (let i = 0; i < binary.length; i++) {
-      const phaseShift: number = binary[i] == 0 ? 0 : (Math.PI / 2)
-      const note = wb.generatePeriod(freq, phaseShift, amplitude)
+      const phase: number = binary[i] == 0 ? 0 : Math.PI
+      const note = wb.generatePeriod(freq, phase, amplitude)
       notes.push(note)
     }
 

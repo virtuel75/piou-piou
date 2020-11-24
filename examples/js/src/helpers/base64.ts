@@ -1,5 +1,5 @@
 export class Base64 {
-    private static readonly keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+    public static readonly keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
     public static encode = (str: string) => {
         let output = []

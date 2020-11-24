@@ -93,13 +93,14 @@ export class WaveBuilder {
     }
 
     /**
-     * Build of sound wave data
+     * Generate sound data
      * @param frequency Frenquency of the sound
-     * @param duration DUration of the sound in seconds
+     * @param phase Phase
+     * @param duration Duration of the sound in seconds
      * @param amplitude Amplitude of the sound on %
      * @param soundWaveType Type of sound wave
      */
-    public generateData = (frequency: number, duration: number, amplitude: number = 100, soundWaveType: SoundWaveType = SoundWaveType.SIN) => {
+    public generateData = (frequency: number, phase: number, duration: number, amplitude: number = 100, soundWaveType: SoundWaveType = SoundWaveType.SIN) => {
         const w: number = 2 * Math.PI * frequency
         const max_amplitude: number = Math.pow(2, (this.BitsPerSample - 1)) - 1
         let data: number[] = []
@@ -113,13 +114,13 @@ export class WaveBuilder {
 
             switch (soundWaveType) {
                 case SoundWaveType.COS:
-                    value = amplitude * this._cosFormula(w, t)
+                    value = amplitude * this._cosFormula(w, t, phase)
                     break;
                 case SoundWaveType.SQUARE:
-                    value = amplitude * this._squareFormula(w, t)
+                    value = amplitude * this._squareFormula(w, t, phase)
                     break;
                 default:
-                    value = amplitude * this._sinFormula(w, t)
+                    value = amplitude * this._sinFormula(w, t, phase)
                     break;
             }
 
@@ -144,6 +145,18 @@ export class WaveBuilder {
         }
 
         return wave
+    }
+
+    /**
+     * Generate sound data in one period of a frequency
+     * @param frequency Frenquency of the sound
+     * @param phase Phase
+     * @param amplitude Amplitude of the sound on %
+     * @param soundWaveType Type of sound wave
+     */
+    public generatePeriod = (frequency: number, phase: number, amplitude: number = 100, soundWaveType: SoundWaveType = SoundWaveType.SIN) => {
+        const period: number = 1 / frequency
+        return this.generateData(frequency, phase, period, amplitude, soundWaveType)
     }
 }
 
