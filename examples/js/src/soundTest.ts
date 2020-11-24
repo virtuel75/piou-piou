@@ -68,9 +68,10 @@ let _createWaveFile = (wavData: WAVEncoderResult) => {
         console.log('Data length :', wavData.data.length)
 
         const output_folder: string = 'output_temp/'
-        const filename: string = "test.wav"
+        const currentDate = new Date().toJSON().replace(/[:.]/g, '_')
+        const filename: string = "sound_" + currentDate + ".wav"
 
-        const output_path = output_folder + '/' + filename
+        const output_path = output_folder + filename
 
         if (!fs.existsSync(output_folder)) {
             fs.mkdirSync(output_folder)
