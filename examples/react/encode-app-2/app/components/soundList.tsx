@@ -41,13 +41,14 @@ export default class SoundListComponent extends Component<SoundListProps, SoundL
     }
 
     public _onDelete = async (index: number) => {
+        await this._unloadPlayer()
         const fileUri: string = this.props.filenames[index]
         console.log('Deleting song : ' + fileUri)
         try {
             await FileSystem.deleteAsync(fileUri)
             this.props.onDelete()
         } catch (error) {
-
+            console.log(error)
         }
     }
 
