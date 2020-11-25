@@ -1,4 +1,4 @@
-import { Audio, AVPlaybackStatus } from 'expo-av';
+import { Audio, AVPlaybackStatus  } from 'expo-av';
 import * as Permissions from "expo-permissions";
 
 export interface RecordResult {
@@ -7,17 +7,41 @@ export interface RecordResult {
     status: AVPlaybackStatus
 }
 
+export const RECORDING_OPTIONS_PRESET_HIGH_QUALITY: Audio.RecordingOptions = {
+    android: {
+      extension: '.wav',
+      outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_DEFAULT,
+      audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_DEFAULT,
+      sampleRate: 44100,
+      numberOfChannels: 2,
+      bitRate: 128000,
+    },
+    ios: {
+      extension: '.wav',
+      audioQuality: Audio.RECORDING_OPTION_IOS_AUDIO_QUALITY_MAX,
+      outputFormat: Audio.RECORDING_OPTION_IOS_OUTPUT_FORMAT_LINEARPCM,
+      sampleRate: 44100,
+      numberOfChannels: 2,
+      bitRate: 128000,
+      linearPCMBitDepth: 16,
+      linearPCMIsBigEndian: false,
+      linearPCMIsFloat: false,
+    },
+};
+
 class Recorder {
     private _haveRecordingPermissions: boolean
     private _recording: Audio.Recording | null
-    private readonly _recordingOptions: Audio.RecordingOptions
+    private readonly _recordingOptions: Audio.RecordingOptions 
+
+    
 
     private audioMode: Partial<Audio.AudioMode> | null
 
     public constructor() {
         this._haveRecordingPermissions = false
         this._recording = null
-        this._recordingOptions = Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+        this._recordingOptions = RECORDING_OPTIONS_PRESET_HIGH_QUALITY
         this.audioMode = null
 
         this._setAudioMode()
