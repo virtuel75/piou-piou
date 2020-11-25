@@ -30,6 +30,13 @@ export default class App extends Component<any, any> {
   private _getFileInStorage = async () => {
     try {
       const directory: string = FileSystem.documentDirectory + this.dataStorageDirectory
+
+      const info = await FileSystem.getInfoAsync(directory)
+
+      if (!info.exists) {
+        await FileSystem.makeDirectoryAsync(directory)
+      }
+
       let files = await FileSystem.readDirectoryAsync(directory)
 
       for (let i = 0; i < files.length; i++) {

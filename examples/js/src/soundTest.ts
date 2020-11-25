@@ -24,7 +24,6 @@ let _generateFrequencyShiftAudio = (bytes: number[]) => {
     const wb: WaveBuilder = new WaveBuilder(1, SampleRateType.RATE_44100, BitsPerSampleType.BIT_8)
     let notes: Wave[] = []
 
-
     for (let i = 0; i < bytes.length; i++) {
         const val = bytes[i]
         const freq: number = val * (freqRange / 64) + 100
@@ -159,6 +158,6 @@ let analyseWave = () => {
 
 //writebyte()
 //createWave()
-//createFreqShiftAudio()
-createPhaseShiftAudio()
+createFreqShiftAudio()
+//createPhaseShiftAudio()
 //analyseWave()
