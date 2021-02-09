@@ -85,7 +85,7 @@ export class WaveBuilder {
     }
 
     private _cosFormula = (w: number, t: number, phase: number = 0) => {
-        return Math.sin((w * t) + phase)
+        return Math.cos((w * t) + phase)
     }
 
     private _squareFormula = (w: number, t: number, phase: number = 0) => {

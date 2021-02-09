@@ -119,9 +119,9 @@ let createPhaseShiftAudio = () => {
 
 let createWave = () => {
     console.log('Creating note...')
-    const noteDO: number = 523.25
-    const noteRE: number = 587.33
-    const noteMI: number = 659.26
+    const noteDO: number = 550
+    const noteRE: number = 144
+    const noteMI: number = 250
 
     console.log('Generating data...')
     const wb = new WaveBuilder(1, SampleRateType.RATE_48000, BitsPerSampleType.BIT_8)
@@ -137,7 +137,7 @@ let createWave = () => {
         console.log('Data length :', result.data.length)
 
         const output_folder: string = 'output_temp/'
-        const filename: string = "test.wav"
+        const filename: string = "3_notes.wav"
 
         const output_path = output_folder + '/' + filename
 
@@ -157,7 +157,7 @@ let analyseWave = () => {
 }
 
 //writebyte()
-//createWave()
-createFreqShiftAudio()
+createWave()
+//createFreqShiftAudio()
 //createPhaseShiftAudio()
 //analyseWave()
