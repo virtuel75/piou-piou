@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Button, Text, View } from "react-native";
 import { SoundPlayer } from "../../helpers/soundPlayer";
 import { SoundStorage } from "../../helpers/soundStorage";
+import { WAV } from "../../helpers/WAV";
 import { styles } from "./sound.styles";
 
 export interface SoundProps {
@@ -45,8 +46,10 @@ export default class SoundComponent extends Component<SoundProps, SoundState> {
 
     private analyse = async () => {
         console.log('Analysing')
-        const result = await SoundStorage.read(this.props.file)
-        console.log(result)
+        const bytes = await SoundStorage.read(this.props.file)
+
+        const wav = WAV.decode(bytes)
+        console.log('WAV content', wav)
     }
 
     public render = () => {

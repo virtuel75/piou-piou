@@ -3,7 +3,7 @@ import { Audio } from "expo-av";
 export class SoundPlayer {
     private static _player: Audio.Sound | null = null
 
-    private static resetPlayer = async () => {
+    public static stop = async () => {
         if (SoundPlayer._player) {
             await SoundPlayer._player.unloadAsync()
             SoundPlayer._player.setOnPlaybackStatusUpdate(null)
@@ -12,7 +12,7 @@ export class SoundPlayer {
     }
 
     public static play = async (file: string) => {
-        await SoundPlayer.resetPlayer()
+        await SoundPlayer.stop()
 
         await Audio.setAudioModeAsync({ allowsRecordingIOS: false })
 

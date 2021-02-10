@@ -126,7 +126,7 @@ export class WaveBuilder {
 
             value += (max_amplitude * (this._bitsPerSample / 8))
 
-            const integerValue: number = Math.round(value)
+            const integerValue: number = Math.floor(value)
             const tmp: number[] = BitSeparator.split(integerValue, 8, this._bitsPerSample / 8)
             tmp.reverse()
 

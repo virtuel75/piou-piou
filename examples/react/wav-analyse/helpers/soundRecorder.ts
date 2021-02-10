@@ -29,15 +29,20 @@ export class SoundRecorder {
     private static _recorderMode: Partial<Audio.AudioMode> | null = null
     private static _recorderOption: Audio.RecordingOptions | null = null
     private static _recorder: Audio.Recording | null = null
+    private static _inited: boolean = false
 
     public static init = () => {
-        SoundRecorder._recorderPermissions = false
-        SoundRecorder._recorderMode = null
-        SoundRecorder._recorderOption = null
+        if (!SoundRecorder._inited) {
+            SoundRecorder._recorderPermissions = false
+            SoundRecorder._recorderMode = null
+            SoundRecorder._recorderOption = null
 
-        SoundRecorder.resetRecording()
-        SoundRecorder.setupRecorder()
-        SoundRecorder.askPermission()
+            SoundRecorder.setupRecorder()
+            SoundRecorder.resetRecording()
+            SoundRecorder.askPermission()
+
+            SoundRecorder._inited = true
+        }
     }
 
     private static setupRecorder = () => {
@@ -54,11 +59,6 @@ export class SoundRecorder {
         SoundRecorder._recorderOption = RECORDING_OPTIONS_PRESET_HIGH_QUALITY
     }
 
-    private static askPermission = async () => {
-        const response = await Permissions.askAsync(Permissions.AUDIO_RECORDING)
-        SoundRecorder._recorderPermissions = response.status === "granted"
-    }
-
     private static resetRecording = async () => {
         if (SoundRecorder._recorder) {
             const status = await SoundRecorder._recorder.getStatusAsync()
@@ -69,6 +69,11 @@ export class SoundRecorder {
                 console.warn('Cannot reset the recording yet. It is still working')
             }
         }
+    }
+
+    public static askPermission = async () => {
+        const response = await Permissions.askAsync(Permissions.AUDIO_RECORDING)
+        SoundRecorder._recorderPermissions = response.status === "granted"
     }
 
     public static start = async (statusUpdate: ((status: Audio.RecordingStatus) => void) | null) => {
@@ -97,7 +102,7 @@ export class SoundRecorder {
             await SoundRecorder.resetRecording()
 
             if (recordURI) {
-                recordURI = await SoundStorage.save(recordURI)
+                recordURI = await SoundStorage.move(recordURI)
             }
 
             return recordURI
