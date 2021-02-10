@@ -4,7 +4,7 @@ import { SoundStorage } from './soundStorage';
 
 export const RECORDING_OPTIONS_PRESET_HIGH_QUALITY: Audio.RecordingOptions = {
     android: {
-        extension: '.wav',
+        extension: '.3gp',
         outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_DEFAULT,
         audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_DEFAULT,
         sampleRate: 44100,

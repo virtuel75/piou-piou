@@ -9,7 +9,7 @@ export interface IWAVChunk {
 
 export class WAV {
 
-    // chunk descriptor
+    // chunk description
     public static readonly CHUNK_ID: string = 'RIFF'
     public static readonly FORMAT: string = 'WAVE'
 
@@ -99,6 +99,114 @@ export class WAV {
         return content
     }
 
+    private static decode_wave_format = (data: number[], bitPerBlock: number) => {
+        // chunk ID (big-endian) - 4 bytes
+        const chunIDBytes: number[] = data.slice(0, 4)
+        const chunkID: string = BitSeparator.assembleString(chunIDBytes)
+
+        // chunk size (litlle-endian) - 4 bytes
+        const chunkSizeBytes: number[] = data.slice(4, 8).reverse()
+        const chunkSize: number = BitSeparator.assemble(chunkSizeBytes, bitPerBlock)
+
+        // format (big-endian) - 4 bytes
+        const formatBytes: number[] = data.slice(8, 12)
+        const format: string = BitSeparator.assembleString(formatBytes)
+
+        let result: IWAVChunk = {
+            chunkID: chunkID,
+            chunkSize: chunkSize,
+            chunkContent: { format: format },
+            subChunks: []
+        }
+
+        let byteIndex: number = 12
+        let nchannel: number = 1
+        let bitsPerSample: number = 16
+
+        while (byteIndex < data.length) {
+            const chunkIDBytes: number[] = data.slice(byteIndex, byteIndex + 4)
+            const subChunkID = BitSeparator.assembleString(chunkIDBytes)
+
+            const subChunkSizeBytes = data.slice(byteIndex + 4, byteIndex + 8).reverse()
+            const subChunkSize = BitSeparator.assemble(subChunkSizeBytes, bitPerBlock)
+
+            byteIndex += 8
+
+            let subChunk: IWAVChunk = {
+                chunkID: subChunkID,
+                chunkSize: subChunkSize
+            }
+
+            let subChunkContent: any
+
+            switch (subChunkID) {
+                case 'fmt ':
+                    subChunkContent = WAV.decode_fmt_chunk(data.slice(byteIndex, byteIndex + subChunkSize), bitPerBlock)
+                    nchannel = subChunkContent.channelNumber ?? 1
+                    bitsPerSample = subChunkContent.bitsPerSample ?? 16
+                    break
+                case 'data':
+                    subChunkContent = WAV.decode_data_chunk(data.slice(byteIndex, byteIndex + subChunkSize), bitPerBlock, nchannel, bitsPerSample)
+                    break
+                default:
+                    break
+            }
+
+            byteIndex += subChunkSize
+
+            subChunk.chunkContent = subChunkContent
+            result.subChunks?.push(subChunk)
+        }
+
+        return result
+    }
+
+    private static decode_3gp_format = (data: number[], bitPerBlock: number) => {
+        // size - 4 bytes
+        const chunkSizeBytes: number[] = data.slice(0, 4)
+        const chunkSize: number = BitSeparator.assemble(chunkSizeBytes, bitPerBlock)
+
+        // chunk ID - 4 bytes
+        const chunIDBytes: number[] = data.slice(4, 8)
+        const chunkID: string = BitSeparator.assembleString(chunIDBytes)
+
+        // format - 4 bytes
+        const formatBytes: number[] = data.slice(8, 12)
+        const format: string = BitSeparator.assembleString(formatBytes)
+
+        let result: IWAVChunk = {
+            chunkID: chunkID,
+            chunkSize: chunkSize,
+            chunkContent: { format: format },
+            subChunks: []
+        }
+
+        let byteIndex: number = chunkSize
+
+        while (byteIndex < data.length) {
+            // sub chunk ID
+            const subChunkSizeBytes = data.slice(byteIndex, byteIndex + 4)
+            const subChunkSize = BitSeparator.assemble(subChunkSizeBytes, bitPerBlock)
+
+            // sub chunk size
+            const chunkIDBytes: number[] = data.slice(byteIndex + 4, byteIndex + 8)
+            const subChunkID = BitSeparator.assembleString(chunkIDBytes)
+
+            byteIndex += 8
+
+            let subChunk: IWAVChunk = {
+                chunkID: subChunkID,
+                chunkSize: subChunkSize
+            }
+
+            byteIndex += subChunkSize - 8
+
+            result.subChunks?.push(subChunk)
+        }
+
+        return result
+    }
+
     public static encode = (signal: number[], nchannel: number, sampleRate: number, bitsPerSample: number) => {
         nchannel = Math.floor(nchannel)
         sampleRate = Math.floor(sampleRate)
@@ -183,66 +291,19 @@ export class WAV {
 
         let result: IWAVChunk | null = null
 
-        // chunk ID (big-endian) - 4 bytes
-        const chunIDBytes: number[] = data.slice(0, 4)
-        const chunkID: string = BitSeparator.assembleString(chunIDBytes)
-
-        // chunk size (litlle-endian) - 4 bytes
-        const chunkSizeBytes: number[] = data.slice(4, 8).reverse()
-        const chunkSize: number = BitSeparator.assemble(chunkSizeBytes, bitPerBlock)
-
         // format (big-endian) - 4 bytes
         const formatBytes: number[] = data.slice(8, 12)
         const format: string = BitSeparator.assembleString(formatBytes)
 
-        result = {
-            chunkID: chunkID,
-            chunkSize: chunkSize,
-            chunkContent: { format: format },
-            subChunks: []
-        }
-
-        let subChunkID: string = ''
-        let i: number = 0
-        let byteIndex: number = 12
-        let nchannel: number = 1
-        let bitsPerSample: number = 16
-
-        while (subChunkID != 'data' && i < 10) {
-            i += 1
-
-            const chunkIDBytes: number[] = data.slice(byteIndex, byteIndex + 4)
-            subChunkID = BitSeparator.assembleString(chunkIDBytes)
-
-            const subChunkSizeBytes = data.slice(byteIndex + 4, byteIndex + 8).reverse()
-            const subChunkSize = BitSeparator.assemble(subChunkSizeBytes, bitPerBlock)
-
-            byteIndex += 8
-
-            let subChunk: IWAVChunk = {
-                chunkID: subChunkID,
-                chunkSize: subChunkSize
-            }
-
-            let subChunkContent: any
-
-            switch (subChunkID) {
-                case 'fmt ':
-                    subChunkContent = WAV.decode_fmt_chunk(data.slice(byteIndex, byteIndex + subChunkSize), bitPerBlock)
-                    nchannel = subChunkContent.channelNumber ?? 1
-                    bitsPerSample = subChunkContent.bitsPerSample ?? 16
-                    break
-                case 'data':
-                    subChunkContent = WAV.decode_data_chunk(data.slice(byteIndex, byteIndex + subChunkSize), bitPerBlock, nchannel, bitsPerSample)
-                    break
-                default:
-                    break
-            }
-
-            byteIndex += subChunkSize
-
-            subChunk.chunkContent = subChunkContent
-            result.subChunks?.push(subChunk)
+        switch (format) {
+            case '3gp5':
+                result = WAV.decode_3gp_format(data, bitPerBlock)
+                break
+            case 'WAVE':
+                result = WAV.decode_wave_format(data, bitPerBlock)
+                break
+            default:
+                break
         }
 
         return result
