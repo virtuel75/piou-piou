@@ -4,20 +4,21 @@ export const styles = StyleSheet.create({
     container: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#fff',
+        backgroundColor: '#020202',
         alignItems: 'center',
         marginTop: Platform.OS == 'android' ? StatusBar.currentHeight : 0
     },
     listContainer: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#f1f1f1',
+        backgroundColor: '#131313',
         paddingTop: 10,
         paddingBottom: 10,
         paddingLeft: 10,
         paddingRight: 10
     },
     listInfo: {
-        marginBottom: 10
+        marginBottom: 20,
+        color: '#b6b6b6'
     }
 })

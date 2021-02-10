@@ -11,7 +11,8 @@ export interface SoundProps {
 }
 
 export interface SoundState {
-    file?: string
+    file?: string,
+    disableAction: boolean
 }
 
 export default class SoundComponent extends Component<SoundProps, SoundState> {
@@ -20,7 +21,8 @@ export default class SoundComponent extends Component<SoundProps, SoundState> {
         super(props)
 
         this.state = {
-            file: 'loading file...'
+            file: 'loading file...',
+            disableAction: false
         }
     }
 
@@ -45,21 +47,25 @@ export default class SoundComponent extends Component<SoundProps, SoundState> {
     }
 
     private analyse = async () => {
+        this.setState({ disableAction: true })
+
         console.log('Analysing')
         const bytes = await SoundStorage.read(this.props.file)
 
         const wav = WAV.decode(bytes)
         console.log('WAV content', wav)
+
+        this.setState({ disableAction: false })
     }
 
     public render = () => {
         return (
             <View style={styles.container}>
-                <Text>{this.state.file}</Text>
+                <Text style={styles.text}>{this.state.file}</Text>
                 <View style={styles.actionsContainer}>
-                    <Button onPress={this.play} title='Play' />
-                    <Button onPress={this.analyse} title='Analyse' />
-                    <Button onPress={this.delete} title='Delete' />
+                    <Button onPress={this.play} title='Play' disabled={this.state.disableAction} color="#ececec" />
+                    <Button onPress={this.analyse} title='Analyse' disabled={this.state.disableAction} color="#ececec" />
+                    <Button onPress={this.delete} title='Delete' disabled={this.state.disableAction} color="#ececec" />
                 </View>
             </View>
         )

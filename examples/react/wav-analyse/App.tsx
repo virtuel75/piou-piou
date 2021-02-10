@@ -41,11 +41,11 @@ export default class App extends Component<any, AppState> {
 	public render = () => {
 		return (
 			<SafeAreaView style={styles.container}>
-				<StatusBar style="dark" />
+				<StatusBar style="light" />
 				<RecorderComponent onStop={this.onRecordEnd}></RecorderComponent>
 				<View style={styles.listContainer}>
 					<Text style={styles.listInfo}>
-						Number of wav file: {this.state.files.length}
+						Number of file: {this.state.files.length}
 					</Text>
 					<FlatList
 						data={this.state.files}
