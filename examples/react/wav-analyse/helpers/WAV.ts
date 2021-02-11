@@ -296,7 +296,7 @@ export class WAV {
         const format: string = BitSeparator.assembleString(formatBytes)
 
         switch (format) {
-            case '3gp5':
+            case '3gp4':
                 result = WAV.decode_3gp_format(data, bitPerBlock)
                 break
             case 'WAVE':
