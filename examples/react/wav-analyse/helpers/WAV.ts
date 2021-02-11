@@ -79,7 +79,7 @@ export class WAV {
                     value = (value - offset) / Math.floor(max_amplitude / 2) * 100
                 }
                 else {
-                    if (value > max_amplitude) {
+                    if (value > (max_amplitude / 2)) {
                         offset = max_amplitude
                     }
                     value = (value - offset) / Math.floor(max_amplitude / 2) * 100
