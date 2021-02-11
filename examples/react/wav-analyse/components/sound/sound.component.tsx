@@ -78,14 +78,16 @@ export default class SoundComponent extends Component<SoundProps, SoundState> {
 
         for (let i = 0; i < magnitudes.length; i++) {
             if (magnitudes[i] > max / 2) {
-                const val = Math.floor(frequencies[i])
+                const val = frequencies[i]
                 const index = freq.findIndex(x => x >= val - 5 && x <= val + 5)
                 if (index == -1)
                     freq.push(val)
+                else
+                    freq[index] = (freq[index] + val) / 2
             }
         }
 
-        return freq
+        return freq.map(x => Math.floor(x))
     }
 
     private analyse = async () => {
