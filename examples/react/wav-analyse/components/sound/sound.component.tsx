@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Alert, Button, Text, View } from "react-native";
 import Spinner from "react-native-loading-spinner-overlay";
-import { Complex } from "../../helpers/Complex";
+import { Complex } from "../../helpers/complex";
 import { FFT } from "../../helpers/ftt";
 import { SoundPlayer } from "../../helpers/soundPlayer";
 import { SoundStorage } from "../../helpers/soundStorage";
@@ -97,6 +97,7 @@ export default class SoundComponent extends Component<SoundProps, SoundState> {
         const bytes = await SoundStorage.read(this.props.file)
 
         const wav = WAV.decode(bytes)
+        console.log(wav)
 
         if (wav) {
             const fmt = wav.subChunks?.filter(x => x.chunkID == 'fmt ')
