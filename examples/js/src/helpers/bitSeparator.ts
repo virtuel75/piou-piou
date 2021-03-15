@@ -71,8 +71,8 @@ export class BitSeparator {
             for (let i = 0; i < str.length; i++) {
                 const c: string = str[i]
                 const cVal: number = c.charCodeAt(0)
-                const reprentation: number[] = BitSeparator.split(cVal, bitsPerCaracter, 1)
-                result.push(...reprentation)
+                const representation: number[] = BitSeparator.split(cVal, bitsPerCaracter, 1)
+                result.push(...representation)
             }
         }
 

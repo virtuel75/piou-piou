@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "encode-test": "ts-node ./src/encodeObject.ts",
-    "sound-test": "ts-node ./src/soundTest.ts",
-    "processing-test": "ts-node ./src/dspTest.ts"
+    "generate": "ts-node ./src/generate.ts",
+    "encode": "ts-node ./src/encode.ts",
+    "decode": "ts-node ./src/decode.ts"
   },
   "license": "MIT",
   "devDependencies": {
